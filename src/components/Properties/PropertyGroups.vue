@@ -57,7 +57,7 @@
 				<div v-else>
 					<span v-if="localValue.length === 0">{{ t('contacts','None') }}</span>
 
-					<div class="group__list">
+					<div v-else class="group__list">
 						<span v-for="(group, index) in localValue">
 						{{ group }}{{ index === (localValue.length - 1)  ? '' : ',&nbsp;' }}
 						</span>
