@@ -30,6 +30,16 @@ const mime = 'text/vcard'
 const name = 'contacts-import'
 const nextcloudVersionIsGreaterThanOr28 = parseInt(OC.config.version.split('.')[0]) >= 28
 
+/**
+ *
+ * @param url
+ */
+function confirmAndNavigate(url) {
+	if (window.confirm(t('contacts', 'Are you sure you want to import this contact?'))) {
+		window.location = url
+	}
+}
+
 if (nextcloudVersionIsGreaterThanOr28) {
 	registerFileAction(new FileAction({
 		id: name,
@@ -44,7 +54,8 @@ if (nextcloudVersionIsGreaterThanOr28) {
 		},
 		iconSvgInline: () => ContactSvg,
 		async exec(file) {
-			window.location = generateUrl(`/apps/contacts/import?file=${file.path}`)
+			const url = generateUrl(`/apps/contacts/import?file=${file.path}`)
+			confirmAndNavigate(url)
 			return true
 		},
 	}))
@@ -59,7 +70,8 @@ if (nextcloudVersionIsGreaterThanOr28) {
 				iconClass: 'icon-contacts-dark',
 				actionHandler(fileName, context) {
 					const absPath = `${context.dir === '/' ? '' : context.dir}/${fileName}`
-					window.location = generateUrl(`/apps/contacts/import?file=${absPath}`)
+					const url = generateUrl(`/apps/contacts/import?file=${absPath}`)
+					confirmAndNavigate(url)
 				},
 			})
 			OCA.Files.fileActions.setDefault(mime, name)
