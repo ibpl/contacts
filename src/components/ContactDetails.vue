@@ -698,7 +698,7 @@ export default {
 		},
 
 		enableToggleBirthdayExclusion() {
-			return parseInt(OC.config.version.split('.')[0]) >= 26
+			return parseInt(window.OC.config.version.split('.')[0]) >= 26
 				&& this.localContact?.vCard // Wait until localContact was fetched
 		},
 
@@ -749,7 +749,7 @@ export default {
 			return this.contact.addressbook.id === 'z-server-generated--system'
 		},
 		nextcloudVersionAtLeast28() {
-			return parseInt(OC.config.version.split('.')[0]) >= 28
+			return parseInt(window.OC.config.version.split('.')[0]) >= 28
 		},
 	},
 

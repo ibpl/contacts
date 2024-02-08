@@ -21,3 +21,8 @@ vendor/
 
 .php-cs-fixer.cache
 composer.phar
+
+css/contacts-contacts-main.css
+css/contacts-files-action.css
+css/contacts-index.css
+css/contacts-main.css

@@ -33,7 +33,7 @@ Vue.prototype.t = t
 
 const mime = 'text/vcard'
 const name = 'contacts-import'
-const nextcloudVersionIsGreaterThanOr28 = parseInt(OC.config.version.split('.')[0]) >= 28
+const nextcloudVersionIsGreaterThanOr28 = parseInt(window.OC.config.version.split('.')[0]) >= 28
 
 if (nextcloudVersionIsGreaterThanOr28) {
 	registerFileAction(new FileAction({
@@ -80,19 +80,19 @@ if (nextcloudVersionIsGreaterThanOr28) {
 	}))
 } else {
 	window.addEventListener('DOMContentLoaded', () => {
-		if (OCA.Files && OCA.Files.fileActions) {
-			OCA.Files.fileActions.registerAction({
+		if (window.OCA.Files && window.OCA.Files.fileActions) {
+			window.OCA.Files.fileActions.registerAction({
 				name,
 				displayName: t('contacts', 'Import'),
 				mime,
-				permissions: OC.PERMISSION_READ,
+				permissions: window.OC.PERMISSION_READ,
 				iconClass: 'icon-contacts-dark',
 				actionHandler(fileName, context) {
 					const absPath = `${context.dir === '/' ? '' : context.dir}/${fileName}`
 					window.location = generateUrl(`/apps/contacts/import?file=${absPath}`)
 				},
 			})
-			OCA.Files.fileActions.setDefault(mime, name)
+			window.OCA.Files.fileActions.setDefault(mime, name)
 			return
 		}
 		console.error('Unable to register vcf import action')
