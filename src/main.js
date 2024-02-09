@@ -37,7 +37,7 @@ import ClickOutside from 'vue-click-outside'
 import { Tooltip as VTooltip } from '@nextcloud/vue'
 
 // Global scss sheets
-import '../css/contacts.scss'
+import './css/contacts.scss'
 
 // Dialogs css
 import '@nextcloud/dialogs/dist/index.css'
