@@ -20,6 +20,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
+
+// eslint-disable-next-line import/no-unresolved, n/no-missing-import
+import 'vite/modulepreload-polyfill'
+
 import ConfirmationDialog from './components/ConfirmationDialog.vue'
 
 import { generateUrl } from '@nextcloud/router'

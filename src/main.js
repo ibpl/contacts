@@ -20,8 +20,10 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-import { generateFilePath } from '@nextcloud/router'
-import { getRequestToken } from '@nextcloud/auth'
+
+// eslint-disable-next-line import/no-unresolved, n/no-missing-import
+import 'vite/modulepreload-polyfill'
+
 import { sync } from 'vuex-router-sync'
 import Vue from 'vue'
 
@@ -39,9 +41,6 @@ import '../css/contacts.scss'
 
 // Dialogs css
 import '@nextcloud/dialogs/dist/index.css'
-
-// eslint-disable-next-line import/no-unresolved, n/no-missing-import
-import 'vite/modulepreload-polyfill'
 
 // Register global directives
 Vue.directive('ClickOutside', ClickOutside)
