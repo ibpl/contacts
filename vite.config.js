@@ -17,8 +17,8 @@ const config = createAppConfig({
 	config,
 	inlineCSS: false,
 	nodePolyfills: {
-		exclude: ['buffer'],
-	}
+		//exclude: ['buffer'],
+	},
 })
 
 export default config
