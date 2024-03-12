@@ -107,7 +107,7 @@
 				</template>
 
 				<!-- delete addressbook -->
-				<ActionButton v-if="hasMultipleAddressbooks && addressbook.url.includes('shared_by')"
+				<ActionButton v-if="hasMultipleAddressbooks && !addressbook.url.includes(addressbook.owner)"
 					@click="confirmDeletion">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
@@ -115,7 +115,7 @@
 					</template>
 					{{ t('contacts', 'Unshare from me') }}
 				</ActionButton>
-				<ActionButton v-else-if="hasMultipleAddressbooks && !addressbook.url.includes('shared_by')"
+				<ActionButton v-else-if="hasMultipleAddressbooks"
 							  @click="confirmDeletion">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
