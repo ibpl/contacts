@@ -116,16 +116,14 @@
 					{{ t('contacts', 'Unshare from me') }}
 				</ActionButton>
 				<ActionButton v-else-if="hasMultipleAddressbooks"
-							  @click="confirmDeletion">
+					@click="confirmDeletion">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
 						<IconDelete :size="20" />
 					</template>
 					{{ t('contacts', 'Delete') }}
 				</ActionButton>
-
 			</Actions>
-
 			<!-- sharing input -->
 			<ShareAddressBook v-if="shareOpen && !addressbook.readOnly" :addressbook="addressbook" />
 		</li>
