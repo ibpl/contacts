@@ -107,7 +107,7 @@
 				</template>
 
 				<!-- delete addressbook -->
-				<ActionButton v-if="hasMultipleAddressbooks && !addressbook.url.includes(addressbook.owner)"
+				<ActionButton v-if="hasMultipleAddressbooks && addressbook.url !== principalUrl"
 					@click="confirmDeletion">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
@@ -149,6 +149,8 @@ import ShareAddressBook from './SettingsAddressbookShare.vue'
 import { showError } from '@nextcloud/dialogs'
 
 import CopyToClipboardMixin from '../../../mixins/CopyToClipboardMixin.js'
+
+import usePrincipalsStore from '../../../store/principals.js'
 
 export default {
 	name: 'SettingsAddressbook',
@@ -247,6 +249,12 @@ export default {
 
 		groupsCount() {
 			return this.groups.length
+		},
+
+		principalUrl() {
+			const principalsStore = usePrincipalsStore()
+
+			return principalsStore.currentUserPrincipal.principalUrl
 		},
 	},
 	watch: {

@@ -95,6 +95,8 @@ import rfcProps from '../models/rfcProps.js'
 import client from '../services/cdav.js'
 import isCirclesEnabled from '../services/isCirclesEnabled.js'
 
+import usePrincipalsStore from '../store/principals.js'
+
 export default {
 	name: 'Contacts',
 
@@ -253,6 +255,8 @@ export default {
 		// get addressbooks then get contacts
 		client.connect({ enableCardDAV: true }).then(() => {
 			this.logger.debug('Connected to dav!', { client })
+			const principalsStore = usePrincipalsStore()
+			principalsStore.setCurrentUserPrincipal(client)
 			this.$store.dispatch('getAddressbooks')
 				.then((addressbooks) => {
 					const writeableAddressBooks = addressbooks.filter(addressbook => !addressbook.readOnly)
