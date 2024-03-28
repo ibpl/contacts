@@ -107,15 +107,15 @@
 				</template>
 
 				<!-- delete addressbook -->
-				<ActionButton v-if="hasMultipleAddressbooks && addressbook.url !== principalUrl"
-					@click="confirmDeletion">
+				<ActionButton v-if="hasMultipleAddressbooks && addressbook.owner !== principalUrl && addressbook.owner !== '/remote.php/dav/principals/system/system/'"
+					@click="confirmUnshare">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
 						<IconDelete :size="20" />
 					</template>
 					{{ t('contacts', 'Unshare from me') }}
 				</ActionButton>
-				<ActionButton v-else-if="hasMultipleAddressbooks"
+				<ActionButton v-else-if="hasMultipleAddressbooks && addressbook.owner !== '/remote.php/dav/principals/system/system/'"
 					@click="confirmDeletion">
 					<template #icon>
 						<IconLoading v-if="deleteAddressbookLoading" :size="20" />
@@ -253,7 +253,6 @@ export default {
 
 		principalUrl() {
 			const principalsStore = usePrincipalsStore()
-
 			return principalsStore.currentUserPrincipal.principalUrl
 		},
 	},
@@ -292,7 +291,6 @@ export default {
 				this.toggleEnabledLoading = false
 			}
 		},
-
 		confirmDeletion() {
 			OC.dialogs.confirm(
 				t('contacts', 'This will delete the address book and every contacts within it'),
@@ -301,7 +299,14 @@ export default {
 				true,
 			)
 		},
-
+		confirmUnshare() {
+			OC.dialogs.confirm(
+				t('contacts', 'This will unshare the address book and every contacts within it'),
+				t('contacts', 'Unshare {addressbook}?', { addressbook: this.addressbook.displayName }),
+				this.deleteAddressbook,
+				true,
+			)
+		},
 		async deleteAddressbook(confirm) {
 			if (confirm) {
 				// change to loading status
