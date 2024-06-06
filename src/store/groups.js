@@ -66,7 +66,11 @@ const mutations = {
 	 * @param {string} data.groupName the name of the group
 	 * @param {Contact} data.contact the contact
 	 */
-	removeContactToGroup(state, { groupName, contact }) {
+	removeContactFromGroup(state, { groupName, contact }) {
+		if (!state.groups.find(search => search.name === groupName)) {
+			return
+		}
+
 		const contacts = state.groups.find(search => search.name === groupName).contacts
 		const index = contacts.findIndex(search => search === contact.key)
 		if (index > -1) {
@@ -101,6 +105,16 @@ const mutations = {
 			contacts: [],
 		})
 	},
+
+	/**
+	 * Remove a group
+	 *
+	 * @param {object} state the store data
+	 * @param {string} groupName the name of the group
+	 */
+	removeGroup(state, groupName) {
+		state.groups = state.groups.filter(group => group.name !== groupName)
+	}
 }
 
 const getters = {
@@ -143,8 +157,8 @@ const actions = {
 	 * @param {string} data.groupName the name of the group
 	 * @param {Contact} data.contact the contact
 	 */
-	removeContactToGroup(context, { groupName, contact }) {
-		context.commit('removeContactToGroup', { groupName, contact })
+	removeContactFromGroup(context, { groupName, contact }) {
+		context.commit('removeContactFromGroup', { groupName, contact })
 	},
 
 	/**

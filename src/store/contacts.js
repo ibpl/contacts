@@ -225,6 +225,8 @@ const mutations = {
 	 * @param {object} state the store data
 	 */
 	sortContacts(state) {
+		console.log(state.contacts)
+
 		state.sortedContacts = Object.values(state.contacts)
 			// exclude groups
 			.filter(contact => contact.kind !== 'group')

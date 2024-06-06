@@ -23,6 +23,12 @@
 					</template>
 					{{ t('contacts', 'Add contacts') }}
 				</ActionButton>
+				<ActionInput @submit="renameGroup" :value.sync="newGroupName">
+					<template #icon>
+						<IconRename :size="20" />
+					</template>
+					{{ t('contacts', 'Rename') }}
+				</ActionInput>
 				<ActionButton :close-after-click="true"
 					@click="downloadGroup(group)">
 					<template #icon>
@@ -57,16 +63,20 @@
 import { emit } from '@nextcloud/event-bus'
 import download from 'downloadjs'
 import moment from 'moment'
+import appendContactToGroup from '../../services/appendContactToGroup.js'
+import removeContactFromGroup from '../../services/removeContactFromGroup.js'
 
 import {
 	NcActionButton as ActionButton,
 	NcCounterBubble,
 	NcAppNavigationItem as AppNavigationItem,
+	NcActionInput as ActionInput,
 } from '@nextcloud/vue'
 import IconContact from 'vue-material-design-icons/AccountMultiple.vue'
 import IconAdd from 'vue-material-design-icons/Plus.vue'
 import IconDownload from 'vue-material-design-icons/Download.vue'
 import IconEmail from 'vue-material-design-icons/Email.vue'
+import IconRename from 'vue-material-design-icons/FolderEdit.vue'
 import { showError } from '@nextcloud/dialogs'
 
 export default {
@@ -76,10 +86,18 @@ export default {
 		ActionButton,
 		NcCounterBubble,
 		AppNavigationItem,
+		ActionInput,
 		IconContact,
 		IconAdd,
 		IconDownload,
 		IconEmail,
+		IconRename,
+	},
+
+	data() {
+		return {
+			newGroupName: '',
+		}
 	},
 
 	props: {
@@ -217,6 +235,42 @@ export default {
 			// We could just do mailto:${emails}, but if we want to use name-addr, not addr-spec, then we
 			// have to explicitly set the "to:" or "bcc:" header.
 			window.location.href = `mailto:?${mode}=${emails.map(encodeURIComponent).join(',')}`
+		},
+
+		/**
+		 * Rename group in store and on server
+		 */
+		renameGroup() {
+			if (this.newGroupName === '') {
+				return
+			}
+
+			this.group.contacts.forEach(async (key) => {
+				const contact = this.$store.getters.getContact(key)
+
+				if (contact === undefined) {
+					return
+				}
+
+				try {
+					await appendContactToGroup(contact, this.newGroupName)
+					await removeContactFromGroup(contact, this.group.name)
+				} catch (e) {
+					console.error('Error renaming group', e)
+					return
+				}
+
+				await this.$store.dispatch('addContactToGroup', {
+					groupName: this.newGroupName,
+					contact
+				})
+				await this.$store.dispatch('removeContactFromGroup', {
+					groupName: this.group.name,
+					contact
+				})
+			})
+
+			this.$store.commit('removeGroup', this.group.name)
 		},
 
 	},
