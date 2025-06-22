@@ -45,6 +45,13 @@
 					@click.prevent="attemptDeleteAllMultiSelected">
 					<IconDelete :size="16" />
 				</NcButton>
+				<NcButton type="tertiary"
+					:disabled="!areTwoEditable"
+					:title="mergeActionTitle"
+					:close-after-click="true"
+					@click.prevent="">
+					<IconSetMerge :size="18" />
+				</NcButton>
 			</div>
 		</transition>
 
@@ -64,6 +71,8 @@ import ContactsListItem from './ContactsList/ContactsListItem.vue'
 import VirtualList from 'vue-virtual-scroll-list'
 import IconSelect from 'vue-material-design-icons/CloseThick.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
+import IconSetMerge from 'vue-material-design-icons/SetMerge.vue'
+
 // eslint-disable-next-line import/no-unresolved
 import IconCancelRaw from '@mdi/svg/svg/cancel.svg?raw'
 // eslint-disable-next-line import/no-unresolved
@@ -79,6 +88,7 @@ export default {
 		NcButton,
 		IconSelect,
 		IconDelete,
+		IconSetMerge,
 		NcDialog,
 	},
 
@@ -160,10 +170,18 @@ export default {
 		isAtLeastOneEditable() {
 			return this.readOnlyMultiSelectedCount !== this.multiSelectedContacts.size
 		},
+		areTwoEditable() {
+			return this.multiSelectedContacts.size - this.readOnlyMultiSelectedCount === 2
+		},
 		deleteActionTitle() {
 			return this.isAtLeastOneEditable
 				? n('contacts', 'Delete {number} contact', 'Delete {number} contacts', this.multiSelectedContacts.size, { number: this.multiSelectedContacts.size })
 				: t('contacts', 'Please select at least one editable contact to delete')
+		},
+		mergeActionTitle() {
+			return this.areTwoEditable
+				? t('contacts', 'Merge contacts')
+				: t('contacts', 'Please select two editable contacts to merge')
 		},
 	},
 
