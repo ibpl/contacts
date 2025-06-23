@@ -25,6 +25,13 @@
 					{ number: readOnlyMultiSelectedCount })" />
 		</NcDialog>
 
+		<NcModal v-if="isMerging"
+			:name="t('contacts', 'Merge contacts')"
+			size="large"
+			@close="isMerging = false">
+			<Merging :contacts="multiSelectedContacts" />
+		</NcModal>
+
 		<div class="contacts-list__header">
 			<div class="search-contacts-field">
 				<input v-model="query" type="text" :placeholder="t('contacts', 'Search contacts …')">
@@ -49,7 +56,7 @@
 					:disabled="!areTwoEditable"
 					:title="mergeActionTitle"
 					:close-after-click="true"
-					@click.prevent="">
+					@click.prevent="isMerging = true">
 					<IconSetMerge :size="18" />
 				</NcButton>
 			</div>
@@ -66,12 +73,13 @@
 </template>
 
 <script>
-import { NcAppContentList as AppContentList, NcButton, NcDialog, NcNoteCard } from '@nextcloud/vue'
+import { NcAppContentList as AppContentList, NcButton, NcDialog, NcNoteCard, NcModal } from '@nextcloud/vue'
 import ContactsListItem from './ContactsList/ContactsListItem.vue'
 import VirtualList from 'vue-virtual-scroll-list'
 import IconSelect from 'vue-material-design-icons/CloseThick.vue'
 import IconDelete from 'vue-material-design-icons/Delete.vue'
 import IconSetMerge from 'vue-material-design-icons/SetMerge.vue'
+import Merging from './ContactsList/Merging.vue'
 
 // eslint-disable-next-line import/no-unresolved
 import IconCancelRaw from '@mdi/svg/svg/cancel.svg?raw'
@@ -90,6 +98,8 @@ export default {
 		IconDelete,
 		IconSetMerge,
 		NcDialog,
+		NcModal,
+		Merging,
 	},
 
 	props: {
@@ -132,6 +142,7 @@ export default {
 				},
 			],
 			lastToggledIndex: undefined,
+			isMerging: false,
 		}
 	},
 
