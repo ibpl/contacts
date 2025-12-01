@@ -44,6 +44,11 @@
 						{{ source.email ? source.email : getTel }}
 					</span>
 				</div>
+				<div v-if="showAddressbook" class="envelope__subtitle">
+					<span class="envelope__subtitle__addressbook">
+						{{ t('contacts', 'from {addressbook}', { addressbook: source.addressbook.displayName }) }}
+					</span>
+				</div>
 			</template>
 		</ListItem>
 	</div>
@@ -92,6 +97,12 @@ export default {
 		},
 
 		isStatic: {
+			type: Boolean,
+			default: false,
+			required: false,
+		},
+
+		showAddressbook: {
 			type: Boolean,
 			default: false,
 			required: false,
@@ -245,6 +256,11 @@ export default {
 			line-height: 130%;
 			overflow: hidden;
 			text-overflow: ellipsis;
+		}
+
+		&__addressbook {
+			line-height: 130%;
+			color: var(--color-text-maxcontrast);
 		}
 	}
 }

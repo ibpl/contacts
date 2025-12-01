@@ -6,16 +6,17 @@
 <template>
 	<div class="batch">
 		<div class="batch__title">
-			<h3 v-if="mode === 'grouping'">
+			<h3 v-if="mode === 'group'">
 				{{ t('contacts', 'Add contacts to groups') }}
 			</h3>
-			<h3 v-if="mode === 'ab'">
+			<h3 v-if="mode === 'move'">
 				{{ t('contacts', 'Move contacts to addressbook') }}
 			</h3>
 		</div>
 
+		<!-- Group selector for group mode -->
 		<NcSelect
-			v-if="mode === 'grouping'"
+			v-if="mode === 'group'"
 			v-model="selectedGroups"
 			:input-label="t('contacts', 'Select groups')"
 			:multiple="true"
@@ -23,26 +24,42 @@
 
 		<!-- Addressbook selector for move mode -->
 		<NcSelect
-			v-if="mode === 'ab'"
+			v-if="mode === 'move'"
 			v-model="selectedAddressesBook"
 			:input-label="t('contacts', 'Select addressbook')"
-			:options="addressbookOptions" />
+			:options="moveTargetOptions" />
 
 		<h6>{{ t('contacts', 'Selected contacts') }}</h6>
-		<NcNoteCard v-if="amountOfReadOnlyContacts > 0" type="info">
-			{{ t('contacts', 'Please note that {count} contact{p} readonly and will not be modified.', { count: amountOfReadOnlyContacts, p: amountOfReadOnlyContacts === 1 ? ' is' : 's are' }) }}
+		<NcNoteCard v-if="mode === 'group' && canModifyCount !== contacts.length" type="info">
+			{{ t('contacts', 'Please note that only {count} of the {total} contacts can be added to a group', { count: canModifyCount, total: contacts.length }) }}
+		</NcNoteCard>
+		<NcNoteCard v-if="mode === 'move' && canDeleteCount !== contacts.length" type="info">
+			{{ t('contacts', 'Please note that only {count} of the {total} contacts can be moved', { count: canDeleteCount, total: contacts.length }) }}
 		</NcNoteCard>
 
 		<div class="contacts-list">
 			<div v-for="(contact, index) in contactsLimited" :key="contact.key" class="contact-item">
 				<ContactsListItem
+					v-if="mode === 'group'"
+					:key="contact.key"
+					:class="{ disabled: !contact.addressbook.canModifyCard }"
+					:index="index"
+					:source="contact"
+					:reload-bus="reloadBus"
+					:title="contact.addressbook.canModifyCard ? '' : t('contacts', 'This contact can not be grouped')"
+					:is-static="true"
+					:show-addressbook="true" />
+
+				<ContactsListItem
+					v-if="mode === 'move'"
 					:key="contact.key"
 					:class="{ disabled: !contact.addressbook.canDeleteCard }"
 					:index="index"
 					:source="contact"
 					:reload-bus="reloadBus"
-					:title="contact.addressbook.canDeleteCard ? '' : t('contacts', 'This contact is read-only and cannot be modified.')"
-					:is-static="true" />
+					:title="contact.addressbook.canDeleteCard ? '' : t('contacts', 'This contact can not be moved')"
+					:is-static="true"
+					:show-addressbook="true" />
 			</div>
 		</div>
 
@@ -58,7 +75,7 @@
 
 		<div class="batch__footer">
 			<NcButton
-				v-if="mode === 'grouping'"
+				v-if="mode === 'group'"
 				variant="primary"
 				:disabled="selectedGroups.length === 0"
 				@click="submit">
@@ -68,7 +85,7 @@
 				{{ t('contacts', 'Add') }}
 			</NcButton>
 			<NcButton
-				v-if="mode === 'ab'"
+				v-if="mode === 'move'"
 				variant="primary"
 				:disabled="!selectedAddressesBook"
 				@click="submit">
@@ -88,6 +105,7 @@ import IconBookArrow from 'vue-material-design-icons/BookArrowRightOutline.vue'
 import IconPlus from 'vue-material-design-icons/Plus.vue'
 import ContactsListItem from './ContactsListItem.vue'
 import appendContactToGroup from '../../services/appendContactToGroup.js'
+import contacts from '../../store/contacts.js'
 
 export default {
 	name: 'Batch',
@@ -111,7 +129,7 @@ export default {
 		mode: {
 			type: String,
 			required: false,
-			default: 'grouping',
+			default: 'group',
 		},
 	},
 
@@ -141,25 +159,29 @@ export default {
 			}))
 		},
 
-		amountOfReadOnlyContacts() {
-			return this.contacts.filter((contact) => !contact.addressbook.canModifyCard).length
+		canModifyCount() {
+			return this.contacts.filter((contact) => contact.addressbook.canModifyCard).length
 		},
 
-		addressbookOptions() {
+		canDeleteCount() {
+			return this.contacts.filter((contact) => contact.addressbook.canDeleteCard).length
+		},
+
+		moveTargetOptions() {
 			// Provide only enabled, writable addressbooks to move to
 			return this.$store.getters.getAddressbooks
-				.filter((ab) => !ab.readOnly && ab.enabled)
+				.filter((ab) => ab.canCreateCard && ab.enabled)
 				.map((ab) => ({ label: ab.displayName || ab.label || ab.addressbook, value: ab.id || ab.addressbook }))
 		},
 	},
 
 	methods: {
 		submit() {
-			if (this.mode === 'grouping') {
+			if (this.mode === 'group') {
 				this.group()
 			}
 
-			if (this.mode === 'ab') {
+			if (this.mode === 'move') {
 				this.moveToAddressbook()
 			}
 		},
@@ -219,7 +241,6 @@ export default {
 
 			await Promise.all(movePromises)
 
-			await this.$store.dispatch('getContactsFromAddressBook', { addressbook })
 			this.$emit('submit')
 		},
 	},
